@@ -10,7 +10,7 @@ import org.apache.flink.util.Collector
  * 1、connect只能合并两条流
  * 2、两个流数据类型可以不一致
  */
-object TransformTestUnion {
+object StreamTestUnion {
   private val alarmTag = new OutputTag[SensorReading]("alarm") {}
   private val normalTag = new OutputTag[SensorReading]("normal") {}
 

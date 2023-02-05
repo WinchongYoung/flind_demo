@@ -1,17 +1,17 @@
 package api.sink
 
 import api.SensorReading
+import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.functions.ProcessFunction
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
 import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer011
 import org.apache.flink.util.Collector
 
 /**
- * 流的合并
- * 1、connect只能合并两条流
- * 2、两个流数据类型可以不一致
+ * kafka sink
  */
-object SinkTestConnect {
+object SinkTestKafka {
   private val alarmTag = new OutputTag[SensorReading]("alarm") {}
   private val normalTag = new OutputTag[SensorReading]("normal") {}
 
@@ -28,10 +28,8 @@ object SinkTestConnect {
         SensorReading(arr(0), arr(1).toLong, arr(2).toDouble).toString
       })
 
-    dataStream.addSink(new SinkFunction[String] {
+    dataStream.addSink(new FlinkKafkaProducer011[String]("localhost:9092", "test", new SimpleStringSchema()))
 
-    })
-
-    env.execute("connect test")
+    env.execute("sink test")
   }
 }

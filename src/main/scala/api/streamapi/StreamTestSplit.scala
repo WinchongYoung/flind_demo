@@ -8,7 +8,7 @@ import org.apache.flink.util.Collector
 /**
  * split过期，使用process方法将流分为多个不同tag的流，然后获取
  */
-object TransformTestSplit {
+object StreamTestSplit {
   private val alarmTag = new OutputTag[SensorReading]("alarm") {}
   private val normalTag = new OutputTag[SensorReading]("normal") {}
 
