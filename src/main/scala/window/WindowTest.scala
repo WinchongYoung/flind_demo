@@ -1,7 +1,6 @@
 package window
 
 import api.SensorReading
-import org.apache.flink.api.common.functions.ReduceFunction
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala._
@@ -18,7 +17,7 @@ object WindowTest {
     env.getConfig.setAutoWatermarkInterval(50)
 
     // 读取数据
-     val inputStream = env.socketTextStream("localhost", 7777)
+    val inputStream = env.socketTextStream("localhost", 7777)
 
     // 先转换成样例类类型（简单转换操作）
     val dataStream = inputStream
@@ -54,8 +53,3 @@ object WindowTest {
   }
 }
 
-class MyReducer extends ReduceFunction[SensorReading] {
-  override def reduce(value1: SensorReading, value2: SensorReading): SensorReading = {
-    SensorReading(value1.id, value2.timestamp, value1.temperature.min(value2.temperature))
-  }
-}
