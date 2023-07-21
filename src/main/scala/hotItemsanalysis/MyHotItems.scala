@@ -14,6 +14,7 @@ import org.apache.flink.util.Collector
 import java.sql.Timestamp
 import java.util.function.Consumer
 import scala.collection.mutable.ListBuffer
+import scala.math.Ordering
 
 /**
  * 滑动窗口统计近一小时热门商品，每5分钟更新一次
@@ -109,7 +110,7 @@ object HotItems {
           listBuffer += t
         }
       })
-      val sortedItems = listBuffer.sortBy(_.count).reverse.take(size)
+      val sortedItems = listBuffer.sortBy(_.count)(Ordering.Long.reverse).take(size)
       val sb = new StringBuilder
       sb.append("+++++++++++++截至时间 ").append(new Timestamp(timestamp - 1)).append("++++++++++").append("\r\n")
       for (i <- sortedItems.indices) {
