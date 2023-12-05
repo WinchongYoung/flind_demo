@@ -1,8 +1,11 @@
 package hotItemsanalysis
 
+import api.SensorReading
 import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.AllWindowFunction
+import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
@@ -45,6 +48,21 @@ class UvCountByWindow() extends AllWindowFunction[UserBehavior, UvCountNew, Time
     }
     val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     out.collect(UvCountNew(dateFormat.format(new Date(window.getEnd)), idSet.size))
+  }
+}
+
+
+class PeriodicAssigner extends AssignerWithPeriodicWatermarks[SensorReading] {
+  val bound: Long = 60 * 1000 // 延时为 1 分钟
+  var maxTs: Long = Long.MinValue // 观察到的最大时间戳
+
+  override def getCurrentWatermark: Watermark = {
+    new Watermark(maxTs - bound)
+  }
+
+  override def extractTimestamp(r: SensorReading, previousTS: Long) = {
+    maxTs = maxTs.max(r.timestamp)
+    r.timestamp
   }
 }
 
